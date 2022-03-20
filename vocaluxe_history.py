@@ -14,7 +14,7 @@ API_GET_CURRENT_SONG_ID_URL = 'getCurrentSongId'
 API_GET_SONG_DETAILS_URL = 'getSong?songId='
 
 # The frequency to poll the vocaluxe server (in seconds).
-POLL_FREQUENCY = 10
+POLL_FREQUENCY = 1
 
 
 # Makes a request to the vocaluxe server.
@@ -61,14 +61,26 @@ def main():
     history_file = output_folder.joinpath(datetime.now().strftime('%b-%d-%Y') + '.txt')
     history_file.touch(exist_ok=True)
 
-    print('Recording vocaluxe play history...')
+    print('Recording vocaluxe play history...', end='\r')
 
     # Setup event loop.
     # Script has no formal exit condition, it will either crash when vocaluxe is closed, or be terminated by the user.
     previous_song = (-1, 'NONE', 'NONE')
+    timeout_flag = False
     while(True):
         time.sleep(POLL_FREQUENCY)
-        current_song = getCurrentSong()
+        try:
+            current_song = getCurrentSong()
+            if timeout_flag:
+                timeout_flag = False
+                print('\033[K', end='\r')
+                print('Recording vocaluxe play history...', end='\r')
+        except requests.exceptions.ConnectionError:
+            if not timeout_flag:
+                timeout_flag = True
+                print('\033[K', end='\r')
+                print('Can\'t connect to the vocaluxe server, retrying...', end='\r')
+            continue
 
         # Only log the current song if it is new.
         if current_song and current_song[0] != previous_song[0]:
