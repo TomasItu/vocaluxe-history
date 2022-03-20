@@ -14,7 +14,7 @@ API_GET_CURRENT_SONG_ID_URL = 'getCurrentSongId'
 API_GET_SONG_DETAILS_URL = 'getSong?songId='
 
 # The frequency to poll the vocaluxe server (in seconds).
-POLL_FREQUENCY = 1
+POLL_FREQUENCY = 10
 
 
 # Makes a request to the vocaluxe server.
