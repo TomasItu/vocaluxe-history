@@ -81,13 +81,23 @@ def main():
                 print('\033[K', end='\r')
                 print('Can\'t connect to the vocaluxe server, retrying...', end='\r')
             continue
+        except:
+            if not timeout_flag:
+                timeout_flag = True
+                print('\033[K', end='\r')
+                print('Unknown error occured, retrying...', end='\r')
+            continue
 
         # Only log the current song if it is new.
         if current_song and current_song[0] != previous_song[0]:
             # Log data as tab (\t) separated values for use in other programs or scripts.
             log_string = '{0}\t{1}\t{2}\n'.format(datetime.now().strftime('%H:%M:%S'), current_song[1], current_song[2])
-            with open(history_file, 'a') as f:
-                f.write(log_string)
+            with open(history_file, 'a', encoding='utf8') as f:
+                try:
+                    f.write(log_string)
+                except:
+                    print('\033[K', end='\r')
+                    print(f'Unknown error when writing {log_string} to file', end='\r')
 
             previous_song = current_song
 
